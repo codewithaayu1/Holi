@@ -9,22 +9,21 @@
 body{
     margin:0;
     overflow:hidden;
-    font-family:Arial, sans-serif;
+    font-family:Arial;
     background:black;
 }
 
 /* Top Bar */
-#topBar{
+.topbar{
     position:fixed;
     top:0;
     width:100%;
-    height:40px;
     background:black;
     color:white;
     text-align:center;
-    line-height:40px;
+    padding:6px;
     font-weight:bold;
-    z-index:1000;
+    z-index:10;
 }
 
 /* Animated Background */
@@ -43,19 +42,18 @@ body::before{
     100%{background-position:right;}
 }
 
-/* Title */
+/* 3D Title */
 h1{
-    margin-top:22vh;
+    margin-top:20vh;
     text-align:center;
     font-size:50px;
     color:white;
-    text-transform:uppercase;
-    text-shadow:0 0 20px red;
+    text-shadow:3px 3px 0 #ff0080,6px 6px 15px rgba(0,0,0,0.6);
     animation:float 3s ease-in-out infinite;
 }
 @keyframes float{
     0%,100%{transform:translateY(0);}
-    50%{transform:translateY(-12px);}
+    50%{transform:translateY(-15px);}
 }
 
 /* Lyrics */
@@ -63,8 +61,16 @@ h1{
     text-align:center;
     margin-top:20px;
     font-size:24px;
-    min-height:50px;
-    font-weight:bold;
+    min-height:40px;
+}
+
+/* Jump Animation */
+.jump{
+    display:inline-block;
+    animation:jump 0.3s ease;
+}
+@keyframes jump{
+    50%{transform:translateY(-10px);}
 }
 
 /* Cursor */
@@ -72,22 +78,11 @@ h1{
     display:inline-block;
     width:3px;
     background:white;
-    margin-left:4px;
+    margin-left:3px;
     animation:blink 0.7s infinite;
 }
 @keyframes blink{
     50%{opacity:0;}
-}
-
-/* Letter Jump */
-.jump{
-    display:inline-block;
-    animation:jump 0.3s ease;
-}
-@keyframes jump{
-    0%{transform:translateY(0);}
-    50%{transform:translateY(-10px);}
-    100%{transform:translateY(0);}
 }
 
 /* Rain */
@@ -103,37 +98,20 @@ h1{
     to{transform:translateY(110vh);}
 }
 
-/* Color Burst */
-.burst{
+/* Gulal */
+.particle{
     position:absolute;
-    width:12px;
-    height:12px;
+    width:10px;
+    height:10px;
     border-radius:50%;
     pointer-events:none;
     animation:explode 1s ease-out forwards;
 }
 @keyframes explode{
     to{
-        transform:translate(var(--x),var(--y)) scale(3);
+        transform:translate(var(--x),var(--y)) scale(2);
         opacity:0;
     }
-}
-
-/* Buttons */
-button{
-    position:absolute;
-    padding:8px 15px;
-    border:none;
-    border-radius:20px;
-    cursor:pointer;
-    font-weight:bold;
-}
-#aboutBtn{ top:60px; right:20px; }
-#musicBtn{
-    bottom:30px;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:22px;
 }
 
 /* About Box */
@@ -142,98 +120,119 @@ button{
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    background:rgba(0,0,0,0.95);
+    background:black;
     padding:30px;
     border-radius:20px;
     width:85%;
     max-width:420px;
     display:none;
     text-align:center;
+    box-shadow:0 0 40px #ff00ff;
+    z-index:20;
 }
-#closeBtn{
-    position:absolute;
-    top:8px;
-    right:12px;
-    background:red;
-    color:white;
+
+#musicBtn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    font-size:30px;
+    background:none;
     border:none;
-    border-radius:50%;
-    width:25px;
-    height:25px;
+    cursor:pointer;
+}
+
+#aboutBtn{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    padding:8px 15px;
+    border:none;
+    border-radius:20px;
     cursor:pointer;
 }
 </style>
 </head>
 <body>
 
-<div id="topBar">✨ Made by Aayu ✨</div>
+<div class="topbar">✨ Made by Aayu ✨</div>
 
 <h1>Happy Holi Mere Dosto</h1>
 <div id="lyrics"></div>
 
 <button id="aboutBtn" onclick="showIntro()">About</button>
-<button id="musicBtn" onclick="startMusic()">🎵</button>
+<button id="musicBtn">🎵</button>
 
 <div id="introBox">
-    <button id="closeBtn" onclick="closeIntro()">X</button>
-    <div id="introText" style="font-size:20px;font-weight:bold;"></div>
+    <button onclick="closeIntro()" style="position:absolute;top:5px;right:10px;background:red;color:white;border:none;border-radius:50%;">X</button>
+    <div id="introText"></div>
 </div>
 
-<audio id="music" src="holi.mp3"></audio>
+<audio id="music" src="holi.mp3" preload="auto"></audio>
 
 <script>
 const music=document.getElementById("music");
 const lyrics=document.getElementById("lyrics");
+const musicBtn=document.getElementById("musicBtn");
 const introText=document.getElementById("introText");
 
+let isPlaying=false;
 let currentLine="";
-let typingInterval;
 
-/* Holi Colors */
+/* Random Color */
 function randomColor(){
     const colors=["red","yellow","blue","green","pink","orange","cyan"];
     return colors[Math.floor(Math.random()*colors.length)];
 }
 
 /* Typing Effect */
-function typeLine(text,element){
-    if(element.innerText.replace(/\u00A0/g,' ')===text.replace(/\u00A0/g,' ')) return;
-
-    clearInterval(typingInterval);
-    element.innerHTML="";
+function typeLine(text,target){
+    if(currentLine===text) return;
+    currentLine=text;
+    target.innerHTML="";
     let i=0;
 
-    typingInterval=setInterval(()=>{
+    let cursor=document.createElement("span");
+    cursor.className="cursor";
+
+    let typing=setInterval(()=>{
         if(i<text.length){
             let span=document.createElement("span");
             span.innerText=text[i];
             span.style.color=randomColor();
             span.classList.add("jump");
-            element.appendChild(span);
+            target.appendChild(span);
             i++;
         }else{
-            clearInterval(typingInterval);
-            let cursor=document.createElement("span");
-            cursor.classList.add("cursor");
-            element.appendChild(cursor);
+            clearInterval(typing);
         }
     },50);
+
+    target.appendChild(cursor);
 }
+
+/* Music Button */
+musicBtn.addEventListener("click",function(){
+    if(!isPlaying){
+        music.currentTime=0;
+        music.play();
+        isPlaying=true;
+        musicBtn.innerText="⏸";
+    }else{
+        music.pause();
+        isPlaying=false;
+        musicBtn.innerText="🎵";
+    }
+});
 
 /* Lyrics Sync */
 music.ontimeupdate=function(){
     let t=music.currentTime;
+
     if(t<10)
         typeLine("Balam Pichkari Jo Tune Mujhe Maari",lyrics);
     else if(t<20)
         typeLine("To Seedhi Saadi Chhori Sharabi Ho Gayi",lyrics);
-    else
-        typeLine("Happy Holi Mere Dosto 🎉",lyrics);
 };
-
-function startMusic(){
-    music.play();
-}
 
 /* Rain */
 function createRain(){
@@ -247,22 +246,22 @@ function createRain(){
 }
 setInterval(createRain,100);
 
-/* Color Blast */
+/* Gulal */
 document.addEventListener("click",function(e){
-    for(let i=0;i<15;i++){
-        const b=document.createElement("div");
-        b.classList.add("burst");
-        b.style.left=e.clientX+"px";
-        b.style.top=e.clientY+"px";
-        b.style.background=randomColor();
-        b.style.setProperty("--x",(Math.random()*200-100)+"px");
-        b.style.setProperty("--y",(Math.random()*200-100)+"px");
-        document.body.appendChild(b);
-        setTimeout(()=>b.remove(),1000);
+    for(let i=0;i<10;i++){
+        const p=document.createElement("div");
+        p.classList.add("particle");
+        p.style.left=e.clientX+"px";
+        p.style.top=e.clientY+"px";
+        p.style.background=randomColor();
+        p.style.setProperty("--x",(Math.random()*160-80)+"px");
+        p.style.setProperty("--y",(Math.random()*160-80)+"px");
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1000);
     }
 });
 
-/* About Section */
+/* About */
 function showIntro(){
     document.getElementById("introBox").style.display="block";
     typeLine("Hi\u00A0\u00A0I\u00A0\u00A0am\u00A0\u00A0Aayu\u00A0\u00A0👋\u00A0\u00A0Aap\u00A0\u00A0sabko\u00A0\u00A0aapke\u00A0\u00A0friend\u00A0\u00A0Web\u00A0\u00A0Developer\u00A0\u00A0Aayu\u00A0\u00A0ki\u00A0\u00A0or\u00A0\u00A0se\u00A0\u00A0Happy\u00A0\u00A0Holi\u00A0\u00A0💸🌈",introText);
@@ -274,4 +273,4 @@ function closeIntro(){
 </script>
 
 </body>
-    </html>
+</html>
