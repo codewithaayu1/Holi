@@ -1,10 +1,760 @@
-<style>
-  #holiCounter {
-    display: none;
-  }
-  #leaderboard {
-    display: none;
-  }
-</style>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Holi - Aayu</title>
 
-<!-- Rest of the index.html content -->
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    font-family:Arial;
+    background:black;
+}
+
+/* Top Black Bar */
+#topBar{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:40px;
+    background:black;
+    color:white;
+    text-align:center;
+    line-height:40px;
+    font-weight:bold;
+    z-index:1000;
+    letter-spacing:2px;
+}
+
+/* Background */
+body::before{
+    content:"";
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:linear-gradient(45deg,#ff0080,#ff8c00,#00f2ff,#ff1493);
+    background-size:400% 400%;
+    animation:bgMove 8s infinite alternate;
+    z-index:-2;
+}
+@keyframes bgMove{
+    0%{background-position:left;}
+    100%{background-position:right;}
+}
+
+/* 3D Title */
+h1{
+    margin-top:22vh;
+    text-align:center;
+    font-size:50px;
+    color:white;
+    text-transform:uppercase;
+    text-shadow:
+        2px 2px 0 #ff0080,
+        4px 4px 0 #00f2ff,
+        6px 6px 20px rgba(0,0,0,0.6);
+    animation:zoomFloat 3s ease-in-out infinite;
+    transition:0.3s;
+}
+@keyframes zoomFloat{
+    0%,100%{transform:translateY(0) scale(1);}
+    50%{transform:translateY(-12px) scale(1.05);}
+}
+.zoomBlast{
+    transform:translateY(-15px) scale(1.2) !important;
+    text-shadow:0 0 30px yellow,0 0 60px red;
+}
+
+/* Lyrics */
+#lyrics{
+    text-align:center;
+    margin-top:20px;
+    font-size:22px;
+    min-height:40px;
+    font-weight:bold;
+    color:white;
+}
+
+/* Rain */
+.drop{
+    position:absolute;
+    top:-20px;
+    width:6px;
+    height:20px;
+    border-radius:50%;
+    animation:fall linear forwards;
+}
+@keyframes fall{
+    to{transform:translateY(110vh);}
+}
+
+/* Gulal */
+.particle{
+    position:absolute;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    pointer-events:none;
+    animation:explode 1s ease-out forwards;
+}
+@keyframes explode{
+    to{
+        transform:translate(var(--x),var(--y)) scale(2);
+        opacity:0;
+    }
+}
+
+/* Fireworks */
+.fire{
+    position:absolute;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    animation:fire 1s ease-out forwards;
+}
+@keyframes fire{
+    to{
+        transform:translate(var(--x),var(--y)) scale(3);
+        opacity:0;
+    }
+}
+
+/* Water Balloon */
+.balloon{
+    position:absolute;
+    width:20px;
+    height:25px;
+    border-radius:50% 50% 50% 0;
+    animation:balloonFall 2s ease-in forwards;
+}
+@keyframes balloonFall{
+    to{
+        transform:translateY(110vh) rotate(45deg);
+        opacity:0;
+    }
+}
+
+/* Diya Animation */
+.diya{
+    position:absolute;
+    width:30px;
+    height:35px;
+    animation:diyaFloat 3s ease-in-out infinite;
+}
+@keyframes diyaFloat{
+    0%,100%{transform:translateY(0) rotate(-5deg);}
+    50%{transform:translateY(-20px) rotate(5deg);}
+}
+
+/* Confetti */
+.confetti{
+    position:absolute;
+    width:8px;
+    height:8px;
+    animation:confettiFall 3s ease-in forwards;
+}
+@keyframes confettiFall{
+    to{
+        transform:translateY(100vh) rotateZ(360deg);
+        opacity:0;
+    }
+}
+
+/* Buttons */
+button{
+    position:absolute;
+    padding:8px 15px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.1);
+}
+
+#aboutBtn{
+    top:60px;
+    right:20px;
+    background:rgba(255,255,255,0.8);
+    color:black;
+}
+
+#musicBtn{
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:22px;
+    background:white;
+}
+
+#themeBtn{
+    top:60px;
+    left:20px;
+    background:rgba(255,255,255,0.8);
+    color:black;
+}
+
+#shareBtn{
+    bottom:30px;
+    right:20px;
+    background:rgba(0,255,0,0.8);
+    color:white;
+}
+
+#balloonBtn{
+    bottom:30px;
+    left:20px;
+    background:rgba(100,200,255,0.8);
+    color:white;
+}
+
+/* About Box */
+#introBox{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(0,0,0,0.95);
+    padding:30px;
+    border-radius:20px;
+    width:85%;
+    max-width:420px;
+    display:none;
+    text-align:center;
+    box-shadow:0 0 40px #ff00ff;
+    z-index:2000;
+}
+
+.neonText{
+    font-size:20px;
+    color:#0ff;
+    text-shadow:0 0 10px #0ff,0 0 20px #ff00ff;
+}
+
+.cursor{
+    border-right:3px solid #0ff;
+    animation:blink 0.7s infinite;
+}
+@keyframes blink{50%{border-color:transparent;}}
+
+#closeBtn{
+    position:absolute;
+    top:8px;
+    right:12px;
+    background:red;
+    color:white;
+    border:none;
+    border-radius:50%;
+    width:25px;
+    height:25px;
+    cursor:pointer;
+    padding:0;
+}
+
+/* Name Input Box */
+#nameBox{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(0,0,0,0.95);
+    padding:30px;
+    border-radius:20px;
+    width:85%;
+    max-width:420px;
+    display:none;
+    text-align:center;
+    box-shadow:0 0 40px #00ff00;
+    z-index:2000;
+}
+
+#nameBox input{
+    width:80%;
+    padding:10px;
+    margin:10px 0;
+    border:2px solid #0ff;
+    border-radius:10px;
+    background:#222;
+    color:#0ff;
+    font-size:16px;
+}
+
+#nameBox button{
+    position:relative;
+    background:#0ff;
+    color:black;
+}
+
+/* Holi Counter */
+#holiCounter{
+    position:fixed;
+    top:100px;
+    right:20px;
+    background:rgba(0,0,0,0.8);
+    color:#0ff;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:bold;
+    display:none;
+    z-index:500;
+}
+
+/* Leaderboard */
+#leaderboard{
+    position:fixed;
+    bottom:100px;
+    right:20px;
+    background:rgba(0,0,0,0.8);
+    color:#0ff;
+    padding:15px;
+    border-radius:10px;
+    max-width:200px;
+    max-height:200px;
+    overflow-y:auto;
+    display:none;
+    z-index:500;
+}
+
+#leaderboard div{
+    padding:5px;
+    border-bottom:1px solid #0ff;
+}
+
+/* Mobile Responsive */
+@media(max-width:768px){
+    h1{
+        font-size:35px;
+        margin-top:15vh;
+    }
+    
+    #lyrics{
+        font-size:16px;
+    }
+    
+    button{
+        padding:6px 12px;
+        font-size:14px;
+    }
+    
+    #aboutBtn{
+        top:50px;
+        right:10px;
+    }
+    
+    #themeBtn{
+        top:50px;
+        left:10px;
+    }
+    
+    #musicBtn{
+        bottom:80px;
+        font-size:18px;
+    }
+    
+    #shareBtn{
+        bottom:25px;
+        right:10px;
+        font-size:14px;
+    }
+    
+    #balloonBtn{
+        bottom:25px;
+        left:10px;
+        font-size:14px;
+    }
+    
+    #introBox, #nameBox{
+        width:90%;
+        max-width:300px;
+    }
+}
+
+/* Dark Mode */
+body.dark-mode{
+    background:#111;
+}
+
+body.dark-mode #topBar{
+    background:#111;
+    box-shadow:0 2px 10px rgba(0,0,0,0.5);
+}
+
+/* Particle Counter */
+#particleCount{
+    position:fixed;
+    top:100px;
+    left:20px;
+    background:rgba(0,0,0,0.8);
+    color:#0ff;
+    padding:10px;
+    border-radius:5px;
+    font-size:12px;
+    display:none;
+}
+</style>
+</head>
+<body>
+
+<div id="topBar">✨ Made by Aayu ✨</div>
+
+<h1 id="mainTitle">Happy Holi Mere Dosto</h1>
+<div id="lyrics"></div>
+
+<button id="themeBtn" onclick="toggleTheme()">🌙</button>
+<button id="aboutBtn" onclick="showIntro()">About</button>
+<button id="balloonBtn" onclick="throwBalloon()">💧</button>
+<button id="musicBtn" onclick="startMusic()">🎵</button>
+<button id="shareBtn" onclick="shareHoli()">Share 📤</button>
+
+<div id="introBox">
+    <button id="closeBtn" onclick="closeIntro()">X</button>
+    <span id="introText" class="neonText"></span><span class="cursor"></span>
+</div>
+
+<div id="nameBox">
+    <h3 style="color:#0ff;">Enter Your Name ✨</h3>
+    <input type="text" id="userName" placeholder="Your name here">
+    <button onclick="setName()">Celebrate! 🎉</button>
+</div>
+
+<div id="holiCounter">
+    <div>🎉 Particles Created</div>
+    <div id="particleCounter" style="font-size:24px;">0</div>
+</div>
+
+<div id="leaderboard">
+    <div style="text-align:center;font-weight:bold;margin-bottom:10px;">🏆 Top Celebrators</div>
+    <div id="leaderboardList"></div>
+</div>
+
+<div id="particleCount">Particles: <span id="particleCountNum">0</span></div>
+
+<audio id="music" src="holi.mp3" loop></audio>
+<audio id="clickSound" src="data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAA"></audio>
+
+<script>
+const music=document.getElementById("music");
+const lyrics=document.getElementById("lyrics");
+const title=document.querySelector("h1");
+let particleCount=0;
+let userName="Guest";
+let leaderboardData=JSON.parse(localStorage.getItem("holiLeaderboard"))||{};
+let easterEggCode="";
+const easterEggSequence="holi";
+
+/* Initialize */
+window.addEventListener("load",()=>{
+    showNameBox();
+    displayLeaderboard();
+});
+
+/* Name Input */
+function showNameBox(){
+    document.getElementById("nameBox").style.display="block";
+}
+
+function setName(){
+    const name=document.getElementById("userName").value;
+    if(name.trim()){
+        userName=name;
+        document.getElementById("nameBox").style.display="none";
+        updateLeaderboard();
+    }
+}
+
+document.getElementById("userName").addEventListener("keypress",(e)=>{
+    if(e.key==="Enter") setName();
+});
+
+/* Rain with Emojis */
+function createRain(){
+    const drop=document.createElement("div");
+    drop.classList.add("drop");
+    drop.style.left=Math.random()*100+"vw";
+    
+    const emojis=["🌸","🌼","💐","🎉","💛"];
+    drop.innerText=emojis[Math.floor(Math.random()*emojis.length)];
+    drop.style.fontSize="20px";
+    drop.style.width="auto";
+    drop.style.height="auto";
+    drop.style.borderRadius="0";
+    
+    drop.style.animationDuration=(Math.random()*2+2)+"s";
+    document.body.appendChild(drop);
+    setTimeout(()=>drop.remove(),4000);
+}
+setInterval(createRain,150);
+
+function randomColor(){
+    const colors=["red","yellow","blue","green","pink","orange","cyan","purple"];
+    return colors[Math.floor(Math.random()*colors.length)];
+}
+
+/* Gulal with Sound */
+document.addEventListener("click",function(e){
+    if(e.target.tagName==="BUTTON"||e.target.closest(".neonText")) return;
+    
+    playClickSound();
+    
+    for(let i=0;i<10;i++){ 
+        const p=document.createElement("div");
+        p.classList.add("particle");
+        p.style.left=e.clientX+"px";
+        p.style.top=e.clientY+"px";
+        p.style.background=randomColor();
+        p.style.setProperty("--x",(Math.random()*160-80)+"px");
+        p.style.setProperty("--y",(Math.random()*160-80)+"px");
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1000);
+    }
+    
+    particleCount+=10;
+    updateParticleCount();
+});
+
+/* Click Sound */
+function playClickSound(){
+    const audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    const oscillator=audioContext.createOscillator();
+    const gainNode=audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value=800;
+    oscillator.type="sine";
+    gainNode.gain.setValueAtTime(0.1,audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01,audioContext.currentTime+0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime+0.1);
+}
+
+/* Fireworks */
+function firework(){
+    for(let i=0;i<20;i++){ 
+        const f=document.createElement("div");
+        f.classList.add("fire");
+        f.style.left=Math.random()*100+"vw";
+        f.style.top=Math.random()*100+"vh";
+        f.style.background=randomColor();
+        f.style.setProperty("--x",(Math.random()*200-100)+"px");
+        f.style.setProperty("--y",(Math.random()*200-100)+"px");
+        document.body.appendChild(f);
+        setTimeout(()=>f.remove(),1000);
+    }
+}
+
+/* Water Balloon */
+function throwBalloon(){
+    for(let i=0;i<5;i++){ 
+        const balloon=document.createElement("div");
+        balloon.classList.add("balloon");
+        balloon.style.left=Math.random()*100+"vw";
+        balloon.style.top="10vh";
+        balloon.style.background=randomColor();
+        document.body.appendChild(balloon);
+        
+        setTimeout(()=>balloon.remove(),2000);
+    }
+    
+    playClickSound();
+}
+
+/* Confetti */
+function createConfetti(){
+    for(let i=0;i<30;i++){ 
+        const c=document.createElement("div");
+        c.classList.add("confetti");
+        c.style.left=Math.random()*100+"vw";
+        c.style.top="-20px";
+        c.style.background=randomColor();
+        document.body.appendChild(c);
+        
+        setTimeout(()=>c.remove(),3000);
+    }
+}
+
+/* Start Music */
+function startMusic(){
+    if(music.paused){
+        music.play();
+        document.getElementById("musicBtn").style.background="yellow";
+    } else {
+        music.pause();
+        document.getElementById("musicBtn").style.background="white";
+    }
+}
+
+/* About */
+function showIntro(){
+    document.getElementById("introBox").style.display="block";
+    document.getElementById("introText").innerHTML="";
+    const msg=`Hi, I am Aayu 👋 Aap Sabko Aapke Dost Web Developer Aayu Ki Taraf Se Happy Holi 🌈 \n\nShakti: ${particleCount} particles created! 🎉`;
+    let i=0;
+    const typing=setInterval(()=>{
+        document.getElementById("introText").innerHTML+=msg[i];
+        i++;
+        if(i>=msg.length) clearInterval(typing);
+    },40);
+}
+
+function closeIntro(){
+    document.getElementById("introBox").style.display="none";
+}
+
+/* Theme Toggle */
+function toggleTheme(){
+    document.body.classList.toggle("dark-mode");
+    const btn=document.getElementById("themeBtn");
+    btn.innerText=document.body.classList.contains("dark-mode")?"☀️":"🌙";
+}
+
+/* Share */
+function shareHoli(){
+    const text=`${userName} celebrates Holi with ${particleCount} colors! 🎨 Join the celebration: Happy Holi! 🌈`;
+    const url=`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    
+    if(navigator.share){
+        navigator.share({
+            title:"Happy Holi",
+            text:text,
+            url:window.location.href
+        });
+    } else {
+        window.open(url,"_blank");
+    }
+}
+
+/* Particle Counter */
+function updateParticleCount(){
+    document.getElementById("particleCountNum").innerText=particleCount;
+    document.getElementById("particleCounter").innerText=particleCount;
+    document.getElementById("holiCounter").style.display="block";
+}
+
+/* Leaderboard */
+function updateLeaderboard(){
+    if(!leaderboardData[userName]){
+        leaderboardData[userName]=0;
+    }
+    leaderboardData[userName]+=particleCount;
+    localStorage.setItem("holiLeaderboard",JSON.stringify(leaderboardData));
+    displayLeaderboard();
+}
+
+function displayLeaderboard(){
+    const sorted=Object.entries(leaderboardData).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const list=document.getElementById("leaderboardList");
+    list.innerHTML="";
+    
+    sorted.forEach((entry,index)=>{
+        const div=document.createElement("div");
+        div.innerHTML=`${index+1}. ${entry[0]}: ${entry[1]}`;
+        list.appendChild(div);
+    });
+    
+    if(sorted.length>0){
+        document.getElementById("leaderboard").style.display="block";
+    }
+}
+
+/* Easter Eggs */
+document.addEventListener("keydown",(e)=>{
+    easterEggCode+=e.key.toLowerCase();
+    easterEggCode=easterEggCode.slice(-4);
+    
+    if(easterEggCode===easterEggSequence){
+        easterEggActivated();
+    }
+});
+
+function easterEggActivated(){
+    for(let i=0;i<10;i++){ 
+        firework();
+    }
+    createConfetti();
+    
+    const msg=document.createElement("div");
+    msg.innerHTML="🎉 SECRET HOLI MODE UNLOCKED! 🎉";
+    msg.style.position="fixed";
+    msg.style.top="50%";
+    msg.style.left="50%";
+    msg.style.transform="translate(-50%,-50%)";
+    msg.style.background="rgba(255,0,0,0.9)";
+    msg.style.color="white";
+    msg.style.padding="20px";
+    msg.style.borderRadius="10px";
+    msg.style.zIndex="3000";
+    msg.style.fontSize="24px";
+    msg.style.fontWeight="bold";
+    document.body.appendChild(msg);
+    
+    setTimeout(()=>msg.remove(),3000);
+    
+    easterEggCode="";
+}
+
+/* Lyrics Sync */
+music.ontimeupdate=function(){
+    let t=music.currentTime;
+    title.classList.remove("zoomBlast");
+
+    if(t<6){
+        lyrics.innerText="Aankhon Se Meetha Tune Khilaayaa";
+    }
+    else if(t<12){
+        lyrics.innerText="Teri Malamal Kee Kurti Gulaabi Ho Gayi";
+    }
+    else if(t<18){
+        lyrics.innerText="Manchali Chaal Kaise Nawabi Ho Gayi?";
+    }
+    else if(t<25){
+        lyrics.innerText="Balam, Pichakaari Jo Tune Muje Maari";
+        title.classList.add("zoomBlast");
+        firework();
+        createConfetti();
+    }
+    else if(t<32){
+        lyrics.innerText="To Sidhi-Saadi Chhoree Sharaabee Ho Gayi";
+    }
+    else if(t<40){
+        lyrics.innerText="Jeans Pahan Ke Jo Tune Maara Thoomkaa";
+        title.classList.add("zoomBlast");
+        firework();
+        createConfetti();
+    }
+    else {
+        lyrics.innerText="Happy Holi Mere Dosto 🎉";
+    }
+};
+
+/* Mobile Touch Support */
+document.addEventListener("touchstart",(e)=>{
+    if(e.touches.length>1){
+        for(let i=0;i<5;i++){ 
+            const touch=e.touches[0];
+            const p=document.createElement("div");
+            p.classList.add("particle");
+            p.style.left=touch.clientX+"px";
+            p.style.top=touch.clientY+"px";
+            p.style.background=randomColor();
+            p.style.setProperty("--x",(Math.random()*160-80)+"px");
+            p.style.setProperty("--y",(Math.random()*160-80)+"px");
+            document.body.appendChild(p);
+            setTimeout(()=>p.remove(),1000);
+        }
+        particleCount+=5;
+        updateParticleCount();
+    }
+});
+</script>
+
+</body>
+  </html>
