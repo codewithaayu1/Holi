@@ -1,1 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Holi 2026  - Aayu</title>
 
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    font-family:Arial;
+    background:black;
+}
+
+/* Top Black Bar */
+#topBar{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:40px;
+    background:black;
+    color:white;
+    text-align:center;
+    line-height:40px;
+    font-weight:bold;
+    z-index:1000;
+    letter-spacing:2px;
+}
+
+/* Background */
+body::before{
+    content:"";
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:linear-gradient(45deg,#ff0080,#ff8c00,#00f2ff,#ff1493);
+    background-size:400% 400%;
+    animation:bgMove 8s infinite alternate;
+    z-index:-2;
+}
+@keyframes bgMove{
+    0%{background-position:left;}
+    100%{background-position:right;}
+}
+
+/* 3D Title */
+h1{
+    margin-top:22vh;
+    text-align:center;
+    font-size:50px;
+    color:white;
+    text-transform:uppercase;
+    text-shadow:
+        2px 2px 0 #ff0080,
+        4px 4px 0 #00f2ff,
+        6px 6px 20px rgba(0,0,0,0.6);
+    animation:zoomFloat 3s ease-in-out infinite;
+    transition:0.3s;
+}
+@keyframes zoomFloat{
+    0%,100%{transform:translateY(0) scale(1);}
+    50%{transform:translateY(-12px) scale(1.05);}
+}
+.zoomBlast{
+    transform:translateY(-15px) scale(1.2) !important;
+    text-shadow:0 0 30px yellow,0 0 60px red;
+}
+
+/* Lyrics */
+#lyrics{
+    text-align:center;
+    margin-top:20px;
+    font-size:22px;
+    min-height:40px;
+    font-weight:bold;
+    color:white;
+}
+
+/* Rain */
+.drop{
+    position:absolute;
+    top:-20px;
+    width:6px;
+    height:20px;
+    border-radius:50%;
+    animation:fall linear forwards;
+}
+@keyframes fall{
+    to{transform:translateY(110vh);}
+}
+
+/* Gulal */
+.particle{
+    position:absolute;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    pointer-events:none;
+    animation:explode 1s ease-out forwards;
+}
+@keyframes explode{
+    to{
+        transform:translate(var(--x),var(--y)) scale(2);
+        opacity:0;
+    }
+}
+
+/* Fireworks */
+.fire{
+    position:absolute;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    animation:fire 1s ease-out forwards;
+}
+@keyframes fire{
+    to{
+        transform:translate(var(--x),var(--y)) scale(3);
+        opacity:0;
+    }
+}
+
+/* Buttons */
+button{
+    position:absolute;
+    padding:8px 15px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+#aboutBtn{
+    top:60px;
+    right:20px;
+}
+
+#musicBtn{
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:22px;
+    background:white;
+}
+
+/* About Box */
+#introBox{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(0,0,0,0.9);
+    padding:30px;
+    border-radius:20px;
+    width:85%;
+    max-width:420px;
+    display:none;
+    text-align:center;
+    box-shadow:0 0 40px #ff00ff;
+}
+
+.neonText{
+    font-size:20px;
+    color:#0ff;
+    text-shadow:0 0 10px #0ff,0 0 20px #ff00ff;
+}
+
+.cursor{
+    border-right:3px solid #0ff;
+    animation:blink 0.7s infinite;
+}
+@keyframes blink{50%{border-color:transparent;}}
+
+#closeBtn{
+    position:absolute;
+    top:8px;
+    right:12px;
+    background:red;
+    color:white;
+    border:none;
+    border-radius:50%;
+    width:25px;
+    height:25px;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="topBar">💸 MADE BY AAYU FROM BIAHR 💸</div>
+
+<h1>Happy Holi Mere Dosto</h1>
+<div id="lyrics"></div>
+
+<button id="aboutBtn" onclick="showIntro()">About</button>
+<button id="musicBtn" onclick="startMusic()">🎵</button>
+
+<div id="introBox">
+    <button id="closeBtn" onclick="closeIntro()">X</button>
+    <span id="introText" class="neonText"></span><span class="cursor"></span>
+</div>
+
+<audio id="music" src="holi.mp3"></audio>
+
+<script>
+const music=document.getElementById("music");
+const lyrics=document.getElementById("lyrics");
+const title=document.querySelector("h1");
+
+/* Rain */
+function createRain(){
+    const drop=document.createElement("div");
+    drop.classList.add("drop");
+    drop.style.left=Math.random()*100+"vw";
+    drop.style.background=randomColor();
+    drop.style.animationDuration=(Math.random()*2+2)+"s";
+    document.body.appendChild(drop);
+    setTimeout(()=>drop.remove(),4000);
+}
+setInterval(createRain,100);
+
+function randomColor(){
+    const colors=["red","yellow","blue","green","pink","orange","cyan"];
+    return colors[Math.floor(Math.random()*colors.length)];
+}
+
+/* Gulal */
+document.addEventListener("click",function(e){
+    for(let i=0;i<10;i++){
+        const p=document.createElement("div");
+        p.classList.add("particle");
+        p.style.left=e.clientX+"px";
+        p.style.top=e.clientY+"px";
+        p.style.background=randomColor();
+        p.style.setProperty("--x",(Math.random()*160-80)+"px");
+        p.style.setProperty("--y",(Math.random()*160-80)+"px");
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),1000);
+    }
+});
+
+/* Fireworks */
+function firework(){
+    for(let i=0;i<20;i++){
+        const f=document.createElement("div");
+        f.classList.add("fire");
+        f.style.left=Math.random()*100+"vw";
+        f.style.top=Math.random()*100+"vh";
+        f.style.background=randomColor();
+        f.style.setProperty("--x",(Math.random()*200-100)+"px");
+        f.style.setProperty("--y",(Math.random()*200-100)+"px");
+        document.body.appendChild(f);
+        setTimeout(()=>f.remove(),1000);
+    }
+}
+
+/* Start Music */
+function startMusic(){
+    music.play();
+}
+
+/* About */
+function showIntro(){
+    document.getElementById("introBox").style.display="block";
+    document.getElementById("introText").innerHTML="";
+    const msg="Hi, I am Aayu 👋 Aap Sabko Aapke Dost Web Developer Aayu Ki Taraf Se Happy Holi 🌈";
+    let i=0;
+    const typing=setInterval(()=>{
+        document.getElementById("introText").innerHTML+=msg[i];
+        i++;
+        if(i>=msg.length) clearInterval(typing);
+    },40);
+}
+function closeIntro(){
+    document.getElementById("introBox").style.display="none";
+}
+
+/* Lyrics Sync */
+music.ontimeupdate=function(){
+    let t=music.currentTime;
+    title.classList.remove("zoomBlast");
+
+    if(t<6)
+        lyrics.innerText="Aankhon Se Meetha Tune Khilaayaa";
+    else if(t<12)
+        lyrics.innerText="Teri Malamal Kee Kurti Gulaabi Ho Gayi";
+    else if(t<18)
+        lyrics.innerText="Manchali Chaal Kaise Nawabi Ho Gayi?";
+    else if(t<25){
+        lyrics.innerText="Balam, Pichakaari Jo Tune Muje Maari";
+        title.classList.add("zoomBlast");
+        firework();
+    }
+    else if(t<32)
+        lyrics.innerText="To Sidhi-Saadi Chhoree Sharaabee Ho Gayi";
+    else if(t<40){
+        lyrics.innerText="Jeans Pahan Ke Jo Tune Maara Thoomkaa";
+        title.classList.add("zoomBlast");
+        firework();
+    }
+    else
+        lyrics.innerText="Happy Holi Mere Dosto 🎉";
+};
+</script>
+
+</body>
+  </html>
