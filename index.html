@@ -13,7 +13,22 @@ body{
     background:black;
 }
 
-/* Animated Background */
+/* Top Black Bar */
+#topBar{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:40px;
+    background:black;
+    color:white;
+    text-align:center;
+    line-height:40px;
+    font-weight:bold;
+    z-index:1000;
+    letter-spacing:2px;
+}
+
+/* Background */
 body::before{
     content:"";
     position:fixed;
@@ -31,31 +46,35 @@ body::before{
 
 /* 3D Title */
 h1{
-    margin-top:18vh;
+    margin-top:22vh;
     text-align:center;
-    font-size:55px;
+    font-size:50px;
     color:white;
     text-transform:uppercase;
     text-shadow:
         2px 2px 0 #ff0080,
         4px 4px 0 #00f2ff,
         6px 6px 20px rgba(0,0,0,0.6);
-    animation:float 3s ease-in-out infinite;
+    animation:zoomFloat 3s ease-in-out infinite;
+    transition:0.3s;
 }
-@keyframes float{
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(-15px);}
+@keyframes zoomFloat{
+    0%,100%{transform:translateY(0) scale(1);}
+    50%{transform:translateY(-12px) scale(1.05);}
+}
+.zoomBlast{
+    transform:translateY(-15px) scale(1.2) !important;
+    text-shadow:0 0 30px yellow,0 0 60px red;
 }
 
-/* Lyrics Neon */
+/* Lyrics */
 #lyrics{
     text-align:center;
     margin-top:20px;
-    font-size:24px;
-    color:#fff;
+    font-size:22px;
     min-height:40px;
-    text-shadow:0 0 10px #ff00ff,0 0 20px #00ffff;
-    transition:0.3s;
+    font-weight:bold;
+    color:white;
 }
 
 /* Rain */
@@ -87,6 +106,44 @@ h1{
     }
 }
 
+/* Fireworks */
+.fire{
+    position:absolute;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    animation:fire 1s ease-out forwards;
+}
+@keyframes fire{
+    to{
+        transform:translate(var(--x),var(--y)) scale(3);
+        opacity:0;
+    }
+}
+
+/* Buttons */
+button{
+    position:absolute;
+    padding:8px 15px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+#aboutBtn{
+    top:60px;
+    right:20px;
+}
+
+#musicBtn{
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:22px;
+    background:white;
+}
+
 /* About Box */
 #introBox{
     position:fixed;
@@ -101,41 +158,19 @@ h1{
     display:none;
     text-align:center;
     box-shadow:0 0 40px #ff00ff;
-    animation:fadeIn 0.4s ease;
-}
-@keyframes fadeIn{
-    from{opacity:0; transform:translate(-50%,-60%);}
-    to{opacity:1; transform:translate(-50%,-50%);}
 }
 
 .neonText{
     font-size:20px;
     color:#0ff;
-    text-shadow:
-        0 0 5px #0ff,
-        0 0 10px #0ff,
-        0 0 20px #ff00ff,
-        0 0 40px #ff00ff;
+    text-shadow:0 0 10px #0ff,0 0 20px #ff00ff;
 }
 
 .cursor{
     border-right:3px solid #0ff;
     animation:blink 0.7s infinite;
 }
-@keyframes blink{
-    50%{border-color:transparent;}
-}
-
-#aboutBtn{
-    position:absolute;
-    top:20px;
-    right:20px;
-    padding:8px 18px;
-    border:none;
-    border-radius:20px;
-    cursor:pointer;
-    font-weight:bold;
-}
+@keyframes blink{50%{border-color:transparent;}}
 
 #closeBtn{
     position:absolute;
@@ -153,10 +188,13 @@ h1{
 </head>
 <body>
 
+<div id="topBar">✨ Made by Aayu ✨</div>
+
 <h1>Happy Holi Mere Dosto</h1>
 <div id="lyrics"></div>
 
 <button id="aboutBtn" onclick="showIntro()">About</button>
+<button id="musicBtn" onclick="startMusic()">🎵</button>
 
 <div id="introBox">
     <button id="closeBtn" onclick="closeIntro()">X</button>
@@ -168,6 +206,7 @@ h1{
 <script>
 const music=document.getElementById("music");
 const lyrics=document.getElementById("lyrics");
+const title=document.querySelector("h1");
 
 /* Rain */
 function createRain(){
@@ -188,7 +227,7 @@ function randomColor(){
 
 /* Gulal */
 document.addEventListener("click",function(e){
-    for(let i=0;i<12;i++){
+    for(let i=0;i<10;i++){
         const p=document.createElement("div");
         p.classList.add("particle");
         p.style.left=e.clientX+"px";
@@ -201,12 +240,30 @@ document.addEventListener("click",function(e){
     }
 });
 
+/* Fireworks */
+function firework(){
+    for(let i=0;i<20;i++){
+        const f=document.createElement("div");
+        f.classList.add("fire");
+        f.style.left=Math.random()*100+"vw";
+        f.style.top=Math.random()*100+"vh";
+        f.style.background=randomColor();
+        f.style.setProperty("--x",(Math.random()*200-100)+"px");
+        f.style.setProperty("--y",(Math.random()*200-100)+"px");
+        document.body.appendChild(f);
+        setTimeout(()=>f.remove(),1000);
+    }
+}
+
+/* Start Music */
+function startMusic(){
+    music.play();
+}
+
 /* About */
 function showIntro(){
     document.getElementById("introBox").style.display="block";
     document.getElementById("introText").innerHTML="";
-    music.play();
-
     const msg="Hi, I am Aayu 👋 Aap Sabko Aapke Dost Web Developer Aayu Ki Taraf Se Happy Holi 🌈";
     let i=0;
     const typing=setInterval(()=>{
@@ -215,15 +272,14 @@ function showIntro(){
         if(i>=msg.length) clearInterval(typing);
     },40);
 }
-
 function closeIntro(){
     document.getElementById("introBox").style.display="none";
-    music.pause();
 }
 
-/* 🎵 Real Lyrics Sync */
+/* Lyrics Sync */
 music.ontimeupdate=function(){
     let t=music.currentTime;
+    title.classList.remove("zoomBlast");
 
     if(t<6)
         lyrics.innerText="Aankhon Se Meetha Tune Khilaayaa";
@@ -231,20 +287,22 @@ music.ontimeupdate=function(){
         lyrics.innerText="Teri Malamal Kee Kurti Gulaabi Ho Gayi";
     else if(t<18)
         lyrics.innerText="Manchali Chaal Kaise Nawabi Ho Gayi?";
-    else if(t<25)
+    else if(t<25){
         lyrics.innerText="Balam, Pichakaari Jo Tune Muje Maari";
+        title.classList.add("zoomBlast");
+        firework();
+    }
     else if(t<32)
         lyrics.innerText="To Sidhi-Saadi Chhoree Sharaabee Ho Gayi";
-    else if(t<40)
+    else if(t<40){
         lyrics.innerText="Jeans Pahan Ke Jo Tune Maara Thoomkaa";
-    else if(t<48)
-        lyrics.innerText="To Lattu Padosan Kee Bhabhi Ho Gayi";
-    else if(t<55)
-        lyrics.innerText="Balam, Pichakaari Jo Tune Muje Maari";
+        title.classList.add("zoomBlast");
+        firework();
+    }
     else
-        lyrics.innerText="To Sidhi-Saadi Chhoree Sharaabee Ho Gayi";
+        lyrics.innerText="Happy Holi Mere Dosto 🎉";
 };
 </script>
 
 </body>
-  </html>
+</html>
